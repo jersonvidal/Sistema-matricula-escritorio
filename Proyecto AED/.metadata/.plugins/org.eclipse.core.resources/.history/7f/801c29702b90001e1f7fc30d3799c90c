@@ -1,0 +1,184 @@
+package gui;
+
+import java.awt.EventQueue;
+
+
+
+import java.awt.Toolkit;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+
+import arreglos.ArregloAlumno;
+import arreglos.ArregloCurso;
+import arreglos.ArregloMatricula;
+import clases.Alumno;
+import clases.Curso;
+import clases.Matricula;
+
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+public class ReporteAlumno extends JDialog implements ActionListener {
+
+	private static final long serialVersionUID = 1L;
+	private JTextField txtCodigoAlumno;
+	private JLabel lblCodigoAlumno;
+	private JButton btnBorrar;
+	private JButton btnBuscar;
+	private JScrollPane scrollPane;
+	private JTextArea txtResultado;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					ReporteAlumno dialog = new ReporteAlumno();
+					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+					dialog.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the dialog.
+	 */
+	public ReporteAlumno() {
+		setIconImage(Toolkit.getDefaultToolkit().getImage("C:\\\\Users\\\\User\\\\Desktop\\\\AED_Proyecto_Grupo_1\\cibertec.png"));
+		
+		setTitle("Reporte | Alumno");
+		setBounds(100, 100, 500, 350);
+		getContentPane().setLayout(null);
+		
+		lblCodigoAlumno = new JLabel("C\u00F3digo");
+		lblCodigoAlumno.setBounds(10, 11, 80, 23);
+		getContentPane().add(lblCodigoAlumno);
+		
+		txtCodigoAlumno = new JTextField();
+		txtCodigoAlumno.setColumns(10);
+		txtCodigoAlumno.setBounds(71, 11, 92, 23);
+		getContentPane().add(txtCodigoAlumno);
+		
+		btnBuscar = new JButton("Buscar");
+		btnBuscar.addActionListener(this);
+		btnBuscar.setBounds(166, 11, 101, 23);
+		getContentPane().add(btnBuscar);
+		
+		btnBorrar = new JButton("Borrar");
+		btnBorrar.addActionListener(this);
+		btnBorrar.setBounds(354, 11, 120, 23);
+		getContentPane().add(btnBorrar);
+		
+		scrollPane = new JScrollPane();
+		scrollPane.setBounds(10, 45, 464, 255);
+		getContentPane().add(scrollPane);
+		
+		txtResultado = new JTextArea();
+		scrollPane.setViewportView(txtResultado);
+		
+		txtResultado = new JTextArea();
+		scrollPane.setViewportView(txtResultado);
+	}
+	
+	//Declaración global
+	ArregloAlumno aa = new ArregloAlumno();
+	ArregloCurso ac = new ArregloCurso();
+	ArregloMatricula am = new ArregloMatricula();
+	
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == btnBuscar) {
+			actionPerformedBtnBuscar(e);
+		}
+		if (e.getSource() == btnBorrar) {
+			actionPerformedBtnBorrar(e);
+		}
+	}
+	
+	
+	
+	protected void actionPerformedBtnBuscar(ActionEvent e) {
+	
+	}
+	
+	protected void actionPerformedBtnBorrar(ActionEvent e) {	
+		txtResultado.setText("");
+	}
+	
+	
+	//M�todos tipo void (sin par�metros)
+		void imprimir(){
+			imprimir("");
+		}
+		
+		
+		void listar() {
+		    // Limpiar el resultado anterior
+		    txtResultado.setText("");
+
+		    // Obtener el código del alumno ingresado
+		    int codigoAlumno = leerCodigoAlumno();
+
+		    // Buscar y mostrar las matrículas del alumno
+		    ArrayList<Matricula> matriculas = am.obtenerMatriculasPorAlumno(codigoAlumno);
+		    if (!matriculas.isEmpty()) {
+		        imprimir("Matrículas del Alumno:");
+		        imprimir("------------------------------------------------------");
+		        imprimir(String.format("%-15s%-20s", "Código del Curso", "Nombre del Curso"));
+		        imprimir("------------------------------------------------------");
+
+		        // Mostrar detalles de cada matrícula
+		        for (Matricula matricula : matriculas) {
+		            Curso curso = ac.buscar(matricula.getCodigoCurso());
+		            if (curso != null) {
+		                imprimir(String.format("%-15s%-20s",
+		                        curso.getCodigoCurso(),
+		                        curso.getAsignatura()));
+		            }
+		        }
+		    } else {
+		        // Si no hay matrículas para el alumno
+		        imprimir("El alumno no está matriculado en ningún curso.");
+		        // Aquí también puedes mostrar los datos del alumno si lo deseas
+		        Alumno alumno = aa.buscar(codigoAlumno);
+		        if (alumno != null) {
+		            imprimir("Datos del Alumno:");
+		            imprimir("------------------------------------------------------");
+		            imprimir(String.format("%-15s%-20s%-20s%-15s", "Código", "Nombre", "Apellido", "DNI"));
+		            imprimir("------------------------------------------------------");
+		            imprimir(String.format("%-15s%-20s%-20s%-15s",
+		                    alumno.getCodigoAlumno(),
+		                    alumno.getNombre(),
+		                    alumno.getApellido(),
+		                    alumno.getDni()));
+		        }
+		    }
+		}
+		
+		//M�todos tipo void (con par�metros)
+		void imprimir(String s){
+			txtResultado.append(s + "\n"); 
+		}
+		void mensaje(String s) {
+			JOptionPane.showMessageDialog(this, s, "Informaci�n", 0);
+		}
+		void error(String s, JTextField txt) {
+			mensaje(s);
+			txt.setText("");
+			txt.requestFocus();
+		}
+		//M�todos que retornan valor
+		int leerCodigoAlumno(){
+			return Integer.parseInt(txtCodigoAlumno.getText().trim());
+		}
+}

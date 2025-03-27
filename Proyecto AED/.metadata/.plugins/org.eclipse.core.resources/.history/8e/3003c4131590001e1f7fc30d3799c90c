@@ -1,0 +1,532 @@
+package gui;
+	
+	import java.awt.EventQueue;
+
+	import javax.swing.JDialog;
+	import javax.swing.JLabel;
+	import javax.swing.JOptionPane;
+	import javax.swing.JTextField;
+	import javax.swing.table.DefaultTableModel;
+	import javax.swing.table.TableColumnModel;
+
+    import arreglos.ArregloAlumno;
+    import arreglos.ArregloMatricula;
+
+	import clases.Matricula;
+	
+	import javax.swing.DefaultComboBoxModel;
+	import javax.swing.JButton;
+	import javax.swing.JScrollPane;
+	import javax.swing.JComboBox;
+	import javax.swing.JComponent;
+	import javax.swing.JTable;
+	import java.awt.event.ActionListener;
+	import java.awt.event.ActionEvent;
+	
+	public class DlgMatricula extends JDialog implements ActionListener {
+	
+		private static final long serialVersionUID = 1L;
+		private JLabel lblCodigoMatricula;
+		private JLabel lblCodigoAlumno;
+		private JLabel lblCodigoCurso;
+		private JTextField txtCodigoMatricula;
+		private JTextField txtCodigoAlumno;
+		private JButton btnBuscar;
+		private JButton btnMatricular;
+		private JButton btnModificar;
+		private JButton btnEliminar;
+		private JButton btnOK;
+		private JButton btnRegresar;
+		private JScrollPane scrollPane;
+		private JComboBox<String> cboCurso;
+		private JTable tblMatricular;
+		private DefaultTableModel modelo;
+		
+		//  Tipo de operación a procesar: Matricular, Modificar o Eliminar
+		private int tipoRegresar;
+		
+		// Constantes para los tipos de operaciones
+		public final static int MATRICULAR = 0;
+		public final static int MODIFICAR = 1;
+		public final static int ELIMINAR = 2;
+	
+		/**
+		 * Launch the application.
+		 */
+		public static void main(String[] args) {
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					try {
+						DlgMatricula dialog = new DlgMatricula();
+						dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+						dialog.setVisible(true);
+					}
+					catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+		}
+	
+		/**
+		 * Create the dialog.
+		 */
+		public DlgMatricula() {
+			setTitle("Matr\u00EDcula");
+			setBounds(100, 100, 650, 450);
+			getContentPane().setLayout(null);
+			
+			lblCodigoMatricula = new JLabel("Codigo de matricula");
+			lblCodigoMatricula.setBounds(10, 11, 117, 23);
+			getContentPane().add(lblCodigoMatricula);
+			
+			lblCodigoAlumno = new JLabel("Codigo del alumno");
+			lblCodigoAlumno.setBounds(10, 36, 117, 23);
+			getContentPane().add(lblCodigoAlumno);
+			
+			lblCodigoCurso = new JLabel("Codigo del curso");
+			lblCodigoCurso.setBounds(10, 61, 101, 23);
+			getContentPane().add(lblCodigoCurso);
+			
+			txtCodigoMatricula = new JTextField();
+			txtCodigoMatricula.setEditable(false);
+			txtCodigoMatricula.setColumns(10);
+			txtCodigoMatricula.setBounds(147, 11, 92, 23);
+			getContentPane().add(txtCodigoMatricula);
+			
+			txtCodigoAlumno = new JTextField();
+			txtCodigoAlumno.setEditable(false);
+			txtCodigoAlumno.setColumns(10);
+			txtCodigoAlumno.setBounds(147, 36, 92, 23);
+			getContentPane().add(txtCodigoAlumno);
+			
+			btnBuscar = new JButton("Buscar");
+			btnBuscar.addActionListener(this);
+			btnBuscar.setEnabled(false);
+			btnBuscar.setBounds(241, 36, 101, 23);
+			getContentPane().add(btnBuscar);
+			
+			btnMatricular = new JButton("Matricular");
+			btnMatricular.addActionListener(this);
+			btnMatricular.setBounds(504, 11, 120, 23);
+			getContentPane().add(btnMatricular);
+			
+			btnModificar = new JButton("Modificar");
+			btnModificar.addActionListener(this);
+			btnModificar.setBounds(504, 36, 120, 23);
+			getContentPane().add(btnModificar);
+			
+			btnEliminar = new JButton("Eliminar");
+			btnEliminar.addActionListener(this);
+			btnEliminar.setBounds(504, 61, 120, 23);
+			getContentPane().add(btnEliminar);
+			
+			btnRegresar = new JButton("Regresar");
+			btnRegresar.addActionListener(this);
+			btnRegresar.setEnabled(false);
+			btnRegresar.setBounds(504, 86, 120, 23);
+			getContentPane().add(btnRegresar);
+			
+			scrollPane = new JScrollPane();
+			scrollPane.setBounds(10, 120, 614, 280);
+			getContentPane().add(scrollPane);
+			
+			tblMatricular = new JTable();
+			tblMatricular.setFillsViewportHeight(true);
+			scrollPane.setViewportView(tblMatricular);
+			
+			cboCurso = new JComboBox<String>();
+			cboCurso.setModel(new DefaultComboBoxModel<String>
+							 (new String[] {"3001", "3002", "3003", "3004", "3005"}));
+			cboCurso.setBounds(147, 61, 92, 22);
+			getContentPane().add(cboCurso);
+			cboCurso.setEditable(false);
+			
+			modelo = new DefaultTableModel();
+			modelo.addColumn("CODIGO MATRICULA");
+			modelo.addColumn("CODIGO ALUMNO");
+			modelo.addColumn("CODIGO CURSO");
+			tblMatricular.setModel(modelo);
+			
+			btnOK = new JButton("OK");
+			btnOK.addActionListener(this);
+			btnOK.setEnabled(false);
+			btnOK.setBounds(241, 61, 101, 22);
+			getContentPane().add(btnOK);
+			cboCurso.setEnabled(false);
+			  cboCurso.setSelectedIndex(-1);
+			
+			
+			
+			ajustarAnchoColumnas();
+			listar();
+		}
+		//  Declaración global
+		ArregloMatricula am = new ArregloMatricula();
+		ArregloAlumno aa = new ArregloAlumno();
+		
+		public void actionPerformed(ActionEvent e) {
+			if (e.getSource() == btnBuscar) {
+				actionPerformedBtnBuscar(e);
+			}
+			if (e.getSource() == btnOK) {
+				actionPerformedBtnOK(e);
+			}
+			if (e.getSource() == btnMatricular) {
+				actionPerformedBtnMatricular(e);
+			}
+			if (e.getSource() == btnModificar) {
+				actionPerformedBtnModificar(e);
+			}
+			if (e.getSource() == btnEliminar) {
+				actionPerformedBtnEliminar(e);
+			}
+			if (e.getSource() == btnRegresar) {
+				actionPerformedBtnRegresar(e);
+			}
+		}
+		
+		protected void actionPerformedBtnBuscar(ActionEvent e) {	
+			buscarMatricula();
+			
+		}
+		
+		protected void actionPerformedBtnOK(ActionEvent e) {
+			switch (tipoRegresar) {
+			case MATRICULAR:
+				 txtCodigoAlumno.setEditable(true);
+				adicionarMatricula();
+				break;
+			case MODIFICAR:
+				modificarMatricula();
+				cboCurso.setEnabled(false);
+				break;
+			case ELIMINAR:
+				eliminarMatricula();
+				
+			}
+		}
+		
+		protected void actionPerformedBtnMatricular(ActionEvent e) {
+			 cboCurso.setSelectedIndex(0);
+			 tipoRegresar = MATRICULAR;
+				cboCurso.setEnabled(true);
+			    txtCodigoAlumno.setText("" + aa.codigoCorrelativo());
+			    txtCodigoMatricula.setText("" + am.codigoCorrelativo());
+			    habilitarBotones(false);
+			
+			
+		}	
+		
+		protected void actionPerformedBtnModificar(ActionEvent e) {		
+			 tipoRegresar = MODIFICAR;
+			 txtCodigoAlumno.setEditable(true);
+			 habilitarBotones(false);
+		}	
+		
+		
+		protected void actionPerformedBtnEliminar(ActionEvent e) {	
+			 tipoRegresar = ELIMINAR;
+			 txtCodigoAlumno.setEditable(true);
+			 habilitarBotones(false);
+			 cboCurso.setEnabled(false);
+			 cboCurso.setEditable(false);
+		}	
+		
+		
+		
+		
+		
+		protected void actionPerformedBtnRegresar(ActionEvent e) {	
+			txtCodigoAlumno.setText("");
+			txtCodigoMatricula.setText("");
+			txtCodigoAlumno.setEditable(false);
+			cboCurso.setEnabled(false);
+			habilitarEntradas(false);
+			habilitarBotones(true);
+		}
+		
+		
+		
+		
+		
+		
+	//  Métodos tipo void (sin parámetros)
+		void ajustarAnchoColumnas() {
+			TableColumnModel tcm = tblMatricular.getColumnModel();
+			tcm.getColumn(0).setPreferredWidth(anchoColumna(10)); // codigo matricula
+			tcm.getColumn(1).setPreferredWidth(anchoColumna(10)); // codigo alumno
+			tcm.getColumn(2).setPreferredWidth(anchoColumna(10)); // codigo curso
+		}
+		
+		
+		
+		
+		
+		void listar() {
+			Matricula x;
+			modelo.setRowCount(0);
+			for (int i=0; i<am.tamanio(); i++) {
+				x = am.obtener(i);
+				Object[] fila = { x.getCodigoMatricula(),
+								  x.getCodigoAlumno(),
+								  x.getCodigoCurso() };
+				modelo.addRow(fila);
+			}
+		}
+		
+		
+		
+		
+		
+		//TODO BIEN ADICIONAR CON MATRICULAR 
+		
+		void adicionarMatricula() {
+			
+			int codigoMatricula = leerCodigoMatricula();
+		    if (codigoMatricula > 0) {
+		        int codigoAlumno = leerCodigoAlumno();
+		        if (codigoAlumno > 0) {
+		            if (am.buscar(codigoAlumno) == null) {
+		            	String codigoCurso = enTextoCurso(leerCodigoCurso()); // Obtener el texto del JComboBox
+		                Matricula nueva = new Matricula(codigoMatricula, codigoAlumno, Integer.parseInt(codigoCurso));
+		                am.adicionar(nueva);
+		                listar();
+		                txtCodigoMatricula.setText("" + am.codigoCorrelativo());
+		                txtCodigoAlumno.setText("" + aa.codigoCorrelativo());
+		                txtCodigoMatricula.requestFocus();
+		            } else {
+		                error("El código de alumno ya existe", txtCodigoMatricula);
+		            }
+		        } else {
+		            error("Ingrese un código de matrícula válido", txtCodigoAlumno);
+		        }
+		    } else {
+		        error("Ingrese un código de alumno válido", txtCodigoMatricula);
+		    }
+		}
+		
+		
+		
+		
+		
+		
+		
+		void modificarMatricula() {
+			 try {
+			        int codigoMatricula = leerCodigoMatricula();
+			        Matricula x = am.buscar(codigoMatricula);
+
+			        if (x != null) {
+			            int codigoAlumno = leerCodigoAlumno();
+			            if (codigoAlumno > 0) {
+			                // Obtiene el texto seleccionado del JComboBox en lugar del índice
+			                String codigoCurso = enTextoCurso(leerCodigoCurso());
+
+			                x.setCodigoAlumno(codigoAlumno);
+			                x.setCodigoCurso(Integer.parseInt(codigoCurso)); // Convertir el código de curso a entero
+
+			                // Buscar la fila correspondiente en la tabla y actualizar sus valores
+			                for (int i = 0; i < modelo.getRowCount(); i++) {
+			                    if (Integer.parseInt(modelo.getValueAt(i, 0).toString()) == codigoMatricula) {
+			                        modelo.setValueAt(codigoCurso, i, 2);
+			                        break; // Una vez encontrado, salir del bucle
+			                    }
+			                }
+
+			                // Limpiar campos después de modificar
+			                
+			                limpiarCampos();
+			            } else {
+			                error("Ingrese un código de matrícula válido", txtCodigoAlumno);
+			            }
+			        } else {
+			            error("El código de alumno " + codigoMatricula + " no existe", txtCodigoMatricula);
+			        }
+			    } catch (Exception e) {
+			        error("Por favor complete la casilla de codigo Alumno", txtCodigoMatricula);
+			    }
+	
+		}
+		
+		
+		
+		
+		
+		
+		void buscarMatricula() {
+			try {
+		        // Paso 1: Leer el código de alumno
+		        int codigoAlumno = leerCodigoAlumno();
+
+		        // Paso 2: Buscar la matrícula asociada al código de alumno
+		        Matricula matricula = am.buscar(codigoAlumno); 
+		           
+
+		        if (matricula != null) {
+		            // Paso 3: Mostrar la información encontrada
+		            txtCodigoMatricula.setText(String.valueOf(matricula.getCodigoMatricula()));
+		            cboCurso.setSelectedItem(String.valueOf(matricula.getCodigoCurso()));
+
+		            // Paso 4: Habilitar la edición del cboCurso
+		            cboCurso.setEnabled(true);
+
+		            // Paso 5: Deshabilitar el botón "Buscar"
+		            btnBuscar.setEnabled(true);
+		         
+		            // Paso adicional: Activar el botón "OK"
+		            btnOK.setEnabled(true);
+		            
+		            
+		            if(tipoRegresar == ELIMINAR) {
+		            	cboCurso.setEnabled(false);
+		            }
+		           
+		           
+		        } else {
+		            // Si no se encuentra la matrícula, mostrar un mensaje de error
+		            error("No se encontró ninguna matrícula para el código de alumno proporcionado", txtCodigoAlumno);
+		        }
+		    } catch (NumberFormatException e) {
+		        // Manejar la excepción si el código de alumno no es un número
+		        error("Ingrese un código de alumno válido", txtCodigoAlumno);
+		    }
+			
+			
+		}
+		
+		
+		
+		
+		void eliminarMatricula() {
+			try {
+				 
+				
+		        int codigo = leerCodigoMatricula();
+		        Matricula x = am.buscar(codigo);
+		       
+		         
+		        if (x != null) {
+		        	
+		        	
+		            // Mostrar los datos correspondientes
+		            mostrarDatosMatricula(x);
+		            
+		        } else {
+		            error("El código " + codigo + " no existe", txtCodigoMatricula);
+		        }
+		       
+
+		    } catch (Exception e) {
+		        error("Ingrese CÓDIGO correcto", txtCodigoMatricula);
+		    }
+		}
+		
+		
+		
+		
+		void mostrarDatosMatricula(Matricula matricula) {
+		    String mensaje = "Datos de la matrícula a eliminar:\n"
+		            + "Código de Matrícula: " + matricula.getCodigoMatricula() + "\n"
+		            + "Código de Alumno: " + matricula.getCodigoAlumno() + "\n"
+		            + "Código de Curso: " + matricula.getCodigoCurso() + "\n";
+
+		    // Mostrar el mensaje con los datos
+		    int confirmacion = confirmar(mensaje + "¿Está seguro de eliminar la matrícula?");
+		   
+		    // Si elige "No", cancelar la operación de eliminar
+		    if (confirmacion == 0) {
+		        btnOK.setEnabled(true);
+		      	am.eliminar(matricula);
+			    listar();
+			        	limpiarCampos();
+			        	  btnOK.setEnabled(false);
+			        	  cboCurso.setEnabled(false);
+		    }
+		        else 
+		        	btnOK.setEnabled(true);
+		        
+		    
+		}
+		
+	 
+		
+		
+		
+		
+		void limpiarCampos() {
+		    // Limpiar los campos que deseas al presionar el botón OK
+		    txtCodigoMatricula.setText("");
+		    txtCodigoAlumno.setText("");
+		    cboCurso.setSelectedIndex(-1);
+		}
+		
+		
+		
+		
+		
+		//  Métodos tipo void (con parámetros)
+		void habilitarEntradas(boolean sino) {
+			txtCodigoMatricula.setEditable(sino);
+			if (tipoRegresar == MATRICULAR)
+			cboCurso.setEnabled(sino);
+		}
+		void habilitarBotones(boolean sino) {
+			if (tipoRegresar == MATRICULAR)
+				btnOK.setEnabled(!sino);
+			else {
+				btnBuscar.setEnabled(!sino);
+				btnOK.setEnabled(false);
+			}
+			btnMatricular.setEnabled(sino);
+			btnModificar.setEnabled(sino);
+			btnEliminar.setEnabled(sino);
+			btnRegresar.setEnabled(!sino);
+		}
+		
+		
+		
+		
+		
+		
+		
+		void mensaje(String s) {
+			JOptionPane.showMessageDialog(this, s, "Información", 0);
+		}
+		void error(String s, JComponent component) {
+			 mensaje(s);
+			    if (component instanceof JTextField) {
+			        JTextField txt = (JTextField) component;
+			        txt.setText("");
+			        txt.requestFocus();
+			    } else if (component instanceof JComboBox) {
+			        JComboBox<?> cbo = (JComboBox<?>) component;
+			        cbo.setSelectedIndex(-1);
+			        cbo.requestFocus();
+			    }
+		}
+		
+		
+		
+		//  Métodos que retornan valor (sin parámetros)
+		int leerCodigoMatricula() {
+			return Integer.parseInt(txtCodigoMatricula.getText().trim());
+		}
+		int leerCodigoAlumno() {
+			return Integer.parseInt(txtCodigoAlumno.getText().trim());
+		}
+		int leerCodigoCurso() {
+			return cboCurso.getSelectedIndex();
+		}
+		//  Métodos que retornan valor (con parámetros)
+		int anchoColumna(int porcentaje) {
+			return porcentaje * scrollPane.getWidth() / 100;
+		}
+		String enTextoCurso(int i) {
+			return cboCurso.getItemAt(i);
+		}
+		int confirmar(String s) {
+			return JOptionPane.showConfirmDialog(this, s, "Alerta", 0, 1, null);
+		}
+		
+	}

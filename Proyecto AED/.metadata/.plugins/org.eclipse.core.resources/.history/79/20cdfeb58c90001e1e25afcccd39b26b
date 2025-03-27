@@ -1,0 +1,494 @@
+package gui;
+
+import arreglos.ArregloAlumno;
+
+import clases.Alumno;
+
+import java.awt.EventQueue;
+
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
+import javax.swing.JButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+public class DlgAlumno extends JDialog implements ActionListener {
+
+	private static final long serialVersionUID = 1L;
+	private JLabel lblCodigo;
+	private JLabel lblNombres;
+	private JLabel lblApellidos;
+	private JLabel lblTelefono;
+	private JLabel lblDni;
+	private JTextField txtCodigo;
+	private JTextField txtNombre;
+	private JTextField txtApellido;
+	private JTextField txtTelefono;
+	private JTextField txtDni;
+	private JButton btnBuscar;
+	private JButton btnOK;
+	private JButton btnIngresar;
+	private JButton btnModificar;
+	private JButton btnConsultar;
+	private JButton btnEliminar;
+	private JButton btnRegresar;
+	private JScrollPane scrollPane;
+	private JTable tblAlumno;
+	private DefaultTableModel modelo;
+	
+	//  Tipo de operación a procesar: ingresar, Consultar, Modificar o Eliminar
+	private int tipoRegresar;
+
+	//  Constantes para los tipos de operaciones
+	public final static int INGRESAR  = 0;
+	public final static int MODIFICAR = 1;
+	public final static int CONSULTAR = 2;
+	public final static int ELIMINAR  = 3;
+	
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					DlgAlumno dialog = new DlgAlumno();
+					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+					dialog.setVisible(true);
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the dialog.
+	 */
+	public DlgAlumno() {
+		setTitle("Mantenimiento | Alumno");
+		setBounds(100, 100, 650, 450);
+		getContentPane().setLayout(null);
+		
+		lblCodigo = new JLabel("C\u00F3digo");
+		lblCodigo.setBounds(10, 11, 80, 23);
+		getContentPane().add(lblCodigo);
+		
+		lblNombres = new JLabel("Nombres");
+		lblNombres.setBounds(10, 36, 70, 23);
+		getContentPane().add(lblNombres);
+		
+		lblApellidos = new JLabel("Apellidos");
+		lblApellidos.setBounds(10, 61, 70, 23);
+		getContentPane().add(lblApellidos);
+		
+		lblTelefono = new JLabel("Tel\u00E9fono");
+		lblTelefono.setBounds(10, 86, 70, 23);
+		getContentPane().add(lblTelefono);
+		
+		lblDni = new JLabel("DNI");
+		lblDni.setBounds(10, 111, 86, 23);
+		getContentPane().add(lblDni);
+		
+		txtCodigo = new JTextField();
+		txtCodigo.setEditable(false);
+		txtCodigo.setColumns(10);
+		txtCodigo.setBounds(90, 11, 92, 23);
+		getContentPane().add(txtCodigo);
+		
+		txtNombre = new JTextField();
+		txtNombre.setEditable(false);
+		txtNombre.setColumns(10);
+		txtNombre.setBounds(90, 36, 195, 23);
+		getContentPane().add(txtNombre);
+		
+		txtApellido = new JTextField();
+		txtApellido.setEditable(false);
+		txtApellido.setColumns(10);
+		txtApellido.setBounds(90, 61, 195, 23);
+		getContentPane().add(txtApellido);
+		
+		txtTelefono = new JTextField();
+		txtTelefono.setEditable(false);
+		txtTelefono.setColumns(10);
+		txtTelefono.setBounds(90, 86, 92, 23);
+		getContentPane().add(txtTelefono);
+		
+		txtDni = new JTextField();
+		txtDni.setEditable(false);
+		txtDni.setColumns(10);
+		txtDni.setBounds(90, 112, 92, 23);
+		getContentPane().add(txtDni);
+		
+		btnBuscar = new JButton("Buscar");
+		btnBuscar.addActionListener(this);
+		btnBuscar.setEnabled(false);
+		btnBuscar.setBounds(184, 11, 101, 23);
+		getContentPane().add(btnBuscar);
+		
+		btnOK = new JButton("OK");
+		btnOK.addActionListener(this);
+		btnOK.setEnabled(false);
+		btnOK.setBounds(185, 111, 100, 23);
+		getContentPane().add(btnOK);
+		
+		btnIngresar = new JButton("Ingresar");
+		btnIngresar.addActionListener(this);
+		btnIngresar.setBounds(504, 11, 120, 23);
+		getContentPane().add(btnIngresar);
+		
+		btnModificar = new JButton("Modificar");
+		btnModificar.addActionListener(this);
+		btnModificar.setBounds(504, 36, 120, 23);
+		getContentPane().add(btnModificar);
+		
+		btnConsultar = new JButton("Consultar");
+		btnConsultar.addActionListener(this);
+		btnConsultar.setBounds(504, 61, 120, 23);
+		getContentPane().add(btnConsultar);
+		
+		btnEliminar = new JButton("Eliminar");
+		btnEliminar.addActionListener(this);
+		btnEliminar.setBounds(504, 86, 120, 23);
+		getContentPane().add(btnEliminar);
+		
+		btnRegresar = new JButton("Regresar");
+		btnRegresar.addActionListener(this);
+		btnRegresar.setEnabled(false);
+		btnRegresar.setBounds(504, 111, 120, 23);
+		getContentPane().add(btnRegresar);
+		
+		scrollPane = new JScrollPane();
+		scrollPane.setBounds(10, 145, 614, 255);
+		getContentPane().add(scrollPane);
+		
+		tblAlumno = new JTable();
+		tblAlumno.setFillsViewportHeight(true);
+		scrollPane.setViewportView(tblAlumno);
+		
+		// tabla
+		modelo = new DefaultTableModel();
+		modelo.addColumn("CODIGO");
+		modelo.addColumn("NOMBRES");
+		modelo.addColumn("APELLIDOS");
+		modelo.addColumn("TELEFONO");
+		modelo.addColumn("DNI");
+		tblAlumno.setModel(modelo);
+		
+		ajustarAnchoColumnas();
+		listar();
+	}
+	
+	// Declaracion global
+	ArregloAlumno al = new ArregloAlumno();
+	
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == btnBuscar) {
+			actionPerformedBtnBuscar(e);
+		}
+		if (e.getSource() == btnOK) {
+			actionPerformedBtnOK(e);
+		}
+		if (e.getSource() == btnIngresar) {
+			actionPerformedBtnIngresar(e);
+		}
+		if (e.getSource() == btnModificar) {
+			actionPerformedBtnModificar(e);
+		}
+		if (e.getSource() == btnConsultar) {
+			actionPerformedBtnConsultar(e);
+		}
+		if (e.getSource() == btnEliminar) {
+			actionPerformedBtnEliminar(e);
+		}
+		if (e.getSource() == btnRegresar) {
+			actionPerformedBtnRegresar(e);
+		}
+	}
+	
+	protected void actionPerformedBtnBuscar(ActionEvent e) {
+		consultarAlumno();
+	}
+	protected void actionPerformedBtnOK(ActionEvent e) {
+		switch (tipoRegresar) {
+		case INGRESAR:
+			ingresarAlumno();
+			break;
+		case MODIFICAR:
+			modificarAlumno();
+			break;
+		case CONSULTAR:
+			consultarAlumno();
+			break;
+		case ELIMINAR:
+			eliminarAlumno();
+		}
+	}
+	protected void actionPerformedBtnIngresar(ActionEvent e) {
+		tipoRegresar = INGRESAR;
+		txtCodigo.setText("" + al.codigoCorrelativo());
+		habilitarEntradas(true);
+		habilitarBotones(false);
+		txtNombre.requestFocus();
+	}
+	protected void actionPerformedBtnModificar(ActionEvent e) {
+		tipoRegresar = MODIFICAR;
+		txtCodigo.setEditable(true);
+		habilitarBotones(false);
+		txtCodigo.requestFocus();
+	}
+	protected void actionPerformedBtnConsultar(ActionEvent e) {
+		tipoRegresar = CONSULTAR;
+		txtCodigo.setEditable(true);
+		habilitarBotones(false);
+		txtCodigo.requestFocus();
+	}
+	protected void actionPerformedBtnEliminar(ActionEvent e) {
+		tipoRegresar = ELIMINAR;
+		txtCodigo.setEditable(true);
+		habilitarBotones(false);
+		txtCodigo.requestFocus();
+	}
+	protected void actionPerformedBtnRegresar(ActionEvent e) {
+		txtCodigo.setText("");
+		txtNombre.setText("");
+		txtApellido.setText("");
+		txtTelefono.setText("");
+		txtDni.setText("");
+		txtCodigo.setEditable(false);
+		habilitarEntradas(false);
+		habilitarBotones(true);
+	}
+	//  Métodos tipo void (sin parámetros)
+	void ajustarAnchoColumnas() {
+		TableColumnModel tcm = tblAlumno.getColumnModel();
+		tcm.getColumn(0).setPreferredWidth(anchoColumna(8)); // codigo
+		tcm.getColumn(1).setPreferredWidth(anchoColumna(18)); // nombres
+		tcm.getColumn(2).setPreferredWidth(anchoColumna(18)); // apellidos
+		tcm.getColumn(3).setPreferredWidth(anchoColumna(10)); // telefono
+		tcm.getColumn(4).setPreferredWidth(anchoColumna(10)); // dni
+	}
+	void listar() {
+		Alumno x;
+		modelo.setRowCount(0);
+		for (int i=0; i<al.tamanio(); i++) {
+			x = al.obtener(i);
+			Object[] fila = { x.getCodigoAlumno(),
+							  x.getNombre(),
+							  x.getApellido(),
+							  x.getTelefono(),
+							  x.getDni() };
+			modelo.addRow(fila);
+		}
+	}
+	
+	
+	void ingresarAlumno() {
+	    int codigo = leerCodigoAlumno();
+	    String nombre = leerNombre();
+	    if (nombre.length() > 0) {
+	        String apellido = leerApellido();
+	        if (apellido.length() > 0) {
+	            String telefono = leerTelefono();
+	            if (telefono.length() > 0) {
+	                String dni = leerDni();
+	                if (dni.length() > 0) {
+	                    if (al.buscar(Integer.parseInt(dni)) == null) {
+	                        Alumno nueva = new Alumno(codigo, nombre, apellido, telefono, dni);
+	                        al.adicionar(nueva);
+	                        listar();
+	                        txtCodigo.setText("" + al.codigoCorrelativo());
+	                        txtNombre.setText("");
+	                        txtApellido.setText("");
+	                        txtTelefono.setText("");
+	                        txtDni.setText("");
+	                        txtNombre.requestFocus();
+	                    } else {
+	                        error("El DNI " + dni + " ya existe", txtDni);
+	                    }
+	                } else {
+	                    error("Ingrese un DNI correcto", txtDni);
+	                }
+	            } else {
+	                error("Ingrese un teléfono válido", txtTelefono);
+	            }
+	        } else {
+	            error("Ingrese un apellido correcto", txtApellido);
+	        }
+	    } else {
+	        error("Ingrese un nombre correcto", txtNombre);
+	    }
+	}
+	
+	
+	
+	void modificarAlumno() {
+	    try {
+	        int codigo = leerCodigoAlumno();
+	        Alumno x = al.buscar(codigo);
+	        if (x != null) {
+	            String nombre = leerNombre();
+	            if (nombre.length() > 0) {
+	                String apellido = leerApellido();
+	                if (apellido.length() > 0) {
+	                    String telefono = leerTelefono();
+	                    if (telefono.length() > 0) {
+	                        x.setNombre(nombre);
+	                        x.setApellido(apellido);
+	                        x.setTelefono(telefono);
+	                        listar();
+	                        txtNombre.requestFocus();
+	                        
+	                        limpiarCampos();
+	                        habilitarEntradas(false);
+
+	                        // Habilitar el botón Buscar y deshabilitar el botón OK
+	                        btnBuscar.setEnabled(true);
+	                        txtApellido.setEditable(false);
+	                        txtCodigo.setEditable(true);
+	                        btnOK.setEnabled(false);
+	                    } else {
+	                        error("Ingrese un teléfono válido", txtTelefono);
+	                    }
+	                } else {
+	                    error("Ingrese un apellido correcto", txtApellido);
+	                }
+	            } else {
+	                error("Ingrese un nombre correcto", txtNombre);
+	            }
+	        } else {
+	            error("El código " + codigo + " no existe", txtCodigo);
+	        }
+	    } catch (Exception e) {
+	        error("Ingrese un código correcto", txtCodigo);
+	    }
+	}
+	
+	
+	
+	
+	void consultarAlumno() {
+	    try {
+	        int codigo = leerCodigoAlumno();
+	        Alumno x = al.buscar(codigo);
+	        if (x != null) {
+	            txtNombre.setText(x.getNombre());
+	            txtApellido.setText(x.getApellido());
+	            txtTelefono.setText(x.getTelefono());
+	            txtDni.setText(x.getDni());
+	            if (tipoRegresar == MODIFICAR) {
+	                habilitarEntradas(true);
+	                txtDni.setEditable(false);
+	                txtApellido.setEditable(true);
+	                txtCodigo.setEditable(false);
+	                btnBuscar.setEnabled(false);
+	                btnOK.setEnabled(true);
+	                txtCodigo.requestFocus();
+	            }
+	            if (tipoRegresar == ELIMINAR) {
+	                txtCodigo.setEditable(false);
+	                btnBuscar.setEnabled(false);
+	                btnOK.setEnabled(true);
+	            }
+	        } else {
+	            error("El código " + codigo + " no existe", txtCodigo);
+	        }
+	    } catch (Exception e) {
+	        error("Ingrese CÓDIGO correcto", txtCodigo);
+	    }
+	}
+	
+	
+	void eliminarAlumno() {
+	    try {
+	        int codigo = leerCodigoAlumno();
+	        Alumno x = al.buscar(codigo);
+	        if (x != null) {
+	            int confirmacion = confirmar("¿Desea eliminar el registro?");
+	            if (confirmacion == 0) {
+	                al.eliminar(x);
+	                listar();
+	                limpiarCampos();
+	                btnOK.setEnabled(false);
+	            }
+	        } else {
+	            error("El código " + codigo + " no existe", txtCodigo);
+	        }
+	    } catch (Exception e) {
+	        error("Ingrese CÓDIGO correcto", txtCodigo);
+	    }
+	}
+	
+	
+	
+	void limpiarCampos() {
+	    // Limpiar los campos que deseas al presionar el botón OK
+	    txtCodigo.setText("");
+	    txtNombre.setText("");
+	    txtApellido.setText("");
+	    txtTelefono.setText("");
+	    txtDni.setText("");
+	}
+	//  Métodos tipo void (con parámetros)
+	void habilitarEntradas(boolean sino) {
+		txtNombre.setEditable(sino);
+		if (tipoRegresar == INGRESAR)
+			txtApellido.setEditable(sino);
+		txtTelefono.setEditable(sino);
+		txtDni.setEditable(sino);
+	}
+	void habilitarBotones(boolean sino) {
+		if (tipoRegresar == INGRESAR)
+			btnOK.setEnabled(!sino);
+		else {
+			btnBuscar.setEnabled(!sino);
+			btnOK.setEnabled(false);
+		}	
+		btnIngresar.setEnabled(sino);
+		btnModificar.setEnabled(sino);
+		btnConsultar.setEnabled(sino);
+		btnEliminar.setEnabled(sino);
+		btnRegresar.setEnabled(!sino);
+	}
+	void mensaje(String s) {
+		JOptionPane.showMessageDialog(this, s, "Información", 0);
+	}
+	void error(String s, JTextField txt) {
+		mensaje(s);
+		txt.setText("");
+		txt.requestFocus();
+	}
+	//  Métodos que retornan valor (sin parámetros)
+	int leerCodigoAlumno() {
+		return Integer.parseInt(txtCodigo.getText().trim());
+	}
+	String leerNombre() {
+		return txtNombre.getText().trim();
+	}
+	String leerApellido() {
+		return txtApellido.getText().trim();
+	}
+	String leerTelefono() {
+		return txtTelefono.getText().trim();
+	}
+	String leerDni() {
+		return txtDni.getText().trim();
+	}
+	//  Métodos que retornan valor (con parámetros)
+	int anchoColumna(int porcentaje) {
+		return porcentaje * scrollPane.getWidth() / 100;
+	}
+	double ajustar(double numero) {
+		return (int)(numero * 10) / 10.0;
+	}
+	int confirmar(String s) {
+		return JOptionPane.showConfirmDialog(this, s, "Alerta", 0, 1, null);
+	}
+}

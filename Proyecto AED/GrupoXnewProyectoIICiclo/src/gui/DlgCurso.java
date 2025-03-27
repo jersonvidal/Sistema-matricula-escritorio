@@ -1,0 +1,427 @@
+package gui;
+
+import javax.swing.JButton;
+
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
+
+import arreglos.ArregloCurso;
+import clases.Curso;
+
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+public class DlgCurso extends JDialog implements ActionListener {
+
+	private static final long serialVersionUID = 1L;
+	private JTextField txtCodigoCurso;
+	private JTextField txtAsignatura;
+	private JTextField txtHora;
+	private JTable tblCurso;
+	private JButton btnRegresar;
+	private JButton btnEliminar;
+	private JButton btnConsultar;
+	private JButton btnModificar;
+	private JButton btnIngresar;
+	private JButton btnOK;
+	private JButton btnBuscar;
+	private JScrollPane scrollPane;
+	private DefaultTableModel modelo;
+	
+	//  Tipo de operación a procesar: ingresar, Consultar, Modificar o Eliminar
+	private int tipoRegresar;
+
+	//  Constantes para los tipos de operaciones
+	public final static int INGRESAR  = 0;
+	public final static int MODIFICAR = 1;
+	public final static int CONSULTAR = 2;
+	public final static int ELIMINAR  = 3;
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		try {
+			DlgCurso dialog = new DlgCurso();
+			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			dialog.setVisible(true);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Create the dialog.
+	 */
+	public DlgCurso() {
+		setTitle("Mantenimiento | Curso");
+		setBounds(100, 100, 651, 450);
+		getContentPane().setLayout(null);
+		
+		JLabel lblCodigoCurso = new JLabel("C\u00F3digo del curso");
+		lblCodigoCurso.setBounds(10, 11, 101, 23);
+		getContentPane().add(lblCodigoCurso);
+		
+		JLabel lblAsignatura = new JLabel("Asignatura");
+		lblAsignatura.setBounds(10, 44, 70, 23);
+		getContentPane().add(lblAsignatura);
+		
+		JLabel lblHora = new JLabel("Horas");
+		lblHora.setBounds(10, 77, 70, 23);
+		getContentPane().add(lblHora);
+		
+		txtCodigoCurso = new JTextField();
+		txtCodigoCurso.setEditable(false);
+		txtCodigoCurso.setColumns(10);
+		txtCodigoCurso.setBounds(147, 11, 92, 23);
+		getContentPane().add(txtCodigoCurso);
+		
+		txtAsignatura = new JTextField();
+		txtAsignatura.setEditable(false);
+		txtAsignatura.setColumns(10);
+		txtAsignatura.setBounds(147, 44, 195, 23);
+		getContentPane().add(txtAsignatura);
+		
+		txtHora = new JTextField();
+		txtHora.setEditable(false);
+		txtHora.setColumns(10);
+		txtHora.setBounds(147, 77, 92, 23);
+		getContentPane().add(txtHora);
+		
+		btnBuscar = new JButton("Buscar");
+		btnBuscar.addActionListener(this);
+		btnBuscar.setEnabled(false);
+		btnBuscar.setBounds(241, 11, 101, 23);
+		getContentPane().add(btnBuscar);
+		
+		btnOK = new JButton("OK");
+		btnOK.addActionListener(this);
+		btnOK.setEnabled(false);
+		btnOK.setBounds(242, 77, 100, 23);
+		getContentPane().add(btnOK);
+		
+		btnIngresar = new JButton("Ingresar");
+		btnIngresar.addActionListener(this);
+		btnIngresar.setBounds(504, 11, 120, 23);
+		getContentPane().add(btnIngresar);
+		
+		btnModificar = new JButton("Modificar");
+		btnModificar.addActionListener(this);
+		btnModificar.setBounds(504, 36, 120, 23);
+		getContentPane().add(btnModificar);
+		
+		btnConsultar = new JButton("Consultar");
+		btnConsultar.addActionListener(this);
+		btnConsultar.setBounds(504, 61, 120, 23);
+		getContentPane().add(btnConsultar);
+		
+		btnEliminar = new JButton("Eliminar");
+		btnEliminar.addActionListener(this);
+		btnEliminar.setBounds(504, 86, 120, 23);
+		getContentPane().add(btnEliminar);
+		
+		btnRegresar = new JButton("Regresar");
+		btnRegresar.addActionListener(this);
+		btnRegresar.setEnabled(false);
+		btnRegresar.setBounds(504, 111, 120, 23);
+		getContentPane().add(btnRegresar);
+		
+		scrollPane = new JScrollPane();
+		scrollPane.setBounds(10, 145, 614, 255);
+		getContentPane().add(scrollPane);
+		
+		tblCurso = new JTable();
+		tblCurso.setFillsViewportHeight(true);
+		scrollPane.setViewportView(tblCurso);
+		
+		modelo = new DefaultTableModel();
+		modelo.addColumn("CODIGO DEL CURSO");
+		modelo.addColumn("ASIGNATURA");
+		modelo.addColumn("Horas");
+		tblCurso.setModel(modelo);
+
+		
+		ajustarAnchoColumnas();
+		listar();
+	}
+	//  Declaración global
+	ArregloCurso ac = new ArregloCurso();
+	
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == btnBuscar) {
+			actionPerformedBtnBuscar(e);
+		}
+		if (e.getSource() == btnOK) {
+			actionPerformedBtnOK(e);
+		}
+		if (e.getSource() == btnIngresar) {
+			actionPerformedBtnIngresar(e);
+		}
+		if (e.getSource() == btnModificar) {
+			actionPerformedBtnModificar(e);
+		}
+		if (e.getSource() == btnConsultar) {
+			actionPerformedBtnConsultar(e);
+		}
+		if (e.getSource() == btnEliminar) {
+			actionPerformedBtnEliminar(e);
+		}
+		if (e.getSource() == btnRegresar) {
+			actionPerformedBtnRegresar(e);
+		}
+	}
+	
+	protected void actionPerformedBtnBuscar(ActionEvent e) {
+		consultarCurso();
+	 int btnBuscar= MODIFICAR;
+		 txtAsignatura.setEditable(true);
+	}
+	protected void actionPerformedBtnOK(ActionEvent e) {
+		switch (tipoRegresar) {
+		case INGRESAR:
+			ingresarCurso();
+			break;
+		case MODIFICAR:
+			modificarCurso();
+			txtAsignatura.setEditable(false);
+			
+			break;
+		case CONSULTAR:
+			consultarCurso();
+			break;
+		case ELIMINAR:
+			eliminarCurso();
+		}
+	}
+	protected void actionPerformedBtnIngresar(ActionEvent e) {
+		tipoRegresar = INGRESAR;
+		txtCodigoCurso.setText("" + ac.codigoCorrelativo());
+		habilitarEntradas(true);
+		habilitarBotones(false);
+		//txtCodigoDocente.requestFocus();
+		txtAsignatura.requestFocus();
+	}
+	protected void actionPerformedBtnModificar(ActionEvent e) {
+		tipoRegresar = MODIFICAR;
+		txtCodigoCurso.setEditable(true);
+		habilitarBotones(false);
+		txtCodigoCurso.requestFocus();
+	}
+	protected void actionPerformedBtnConsultar(ActionEvent e) {
+		tipoRegresar = CONSULTAR;
+		txtCodigoCurso.setEditable(true);
+		habilitarBotones(false);
+		txtCodigoCurso.requestFocus();
+	}
+	protected void actionPerformedBtnEliminar(ActionEvent e) {
+		tipoRegresar = ELIMINAR;
+		txtCodigoCurso.setEditable(true);
+		habilitarBotones(false);
+		txtCodigoCurso.requestFocus();
+	}
+	protected void actionPerformedBtnRegresar(ActionEvent e) {
+		txtCodigoCurso.setText("");
+		txtAsignatura.setText("");
+		txtHora.setText("");
+		txtCodigoCurso.setEditable(false);
+		habilitarEntradas(false);
+		habilitarBotones(true);
+	}
+	//  Métodos tipo void (sin parámetros)
+	void ajustarAnchoColumnas() {
+		TableColumnModel tcm = tblCurso.getColumnModel();
+		tcm.getColumn(0).setPreferredWidth(anchoColumna(10)); // codigo curso
+		tcm.getColumn(1).setPreferredWidth(anchoColumna(18)); // nombre
+		tcm.getColumn(2).setPreferredWidth(anchoColumna(5)); // horas
+	}
+
+	void listar() {
+		Curso x;
+		modelo.setRowCount(0);
+		for (int i=0; i<ac.tamanio(); i++) {
+			x = ac.obtener(i);
+			Object[] fila = { x.getCodigoCurso(),
+							  x.getAsignatura(),
+							  x.getHora() };
+			modelo.addRow(fila);
+		}
+	}
+	void ingresarCurso() {
+		int codigoCurso = leerCodigoCurso();
+	    if (codigoCurso > 0) {
+	        	String asignatura = leerAsignatura();
+			    if (asignatura.length() > 0) {
+	                int hora = leerHoras();
+	                if (hora > 0) {
+	                    if (ac.buscar(codigoCurso) == null) {
+	                        Curso nueva = new Curso(codigoCurso, asignatura, hora);
+	                        ac.adicionar(nueva);
+	                        listar();
+	                        txtCodigoCurso.setText("" + ac.codigoCorrelativo());
+	                        txtAsignatura.setText("");
+	                        txtHora.setText("");
+	                        txtAsignatura.requestFocus();
+	                    } else {
+	                        error("El curso con el código " + codigoCurso + " ya existe", txtCodigoCurso);
+	                    }
+	                } else {
+	                    error("Ingrese una hora válida para el curso", txtHora);
+	                }
+	            } else {
+	                error("Ingrese un nombre válido para el curso", txtAsignatura);
+	            }
+	    } else {
+	        error("Ingrese un código de curso válido", txtCodigoCurso);
+	    }
+	}
+
+	void modificarCurso() {
+		 try {
+		        int codigoCurso = leerCodigoCurso();
+		        Curso x = ac.buscar(codigoCurso);
+
+		        if (x != null) {
+		        	String asignatura = leerAsignatura();
+		            if (asignatura.length() > 0) {
+		                int Hora = leerHoras();
+		                if (Hora > 0) {
+		                    
+		                    x.setHora(Hora);
+		                    x.setAsignatura(asignatura);
+		                    listar();
+		                    txtAsignatura.requestFocus();
+
+		                    limpiarCampos();
+		                    habilitarEntradas(false);
+		                    
+		                    // Habilitar el botón Buscar y deshabilitar el botón OK
+		                    
+		                    btnBuscar.setEnabled(true);
+		                   
+		                    btnOK.setEnabled(false);
+		                } else {
+		                    error("Ingrese una hora válida", txtHora);
+		                }
+		            } else {
+		                error("Ingrese una asignatura válido", txtAsignatura);
+		            }
+		        } else {
+		            error("El código de curso " + codigoCurso + " no existe", txtCodigoCurso);
+		        }
+		    } catch (Exception e) {
+		        error("Ingrese un código de curso correcto", txtCodigoCurso);
+		    }
+	}
+
+
+	void consultarCurso() {
+		try {
+	        int codigoCurso = leerCodigoCurso(); 
+	        Curso x = ac.buscar(codigoCurso); 
+
+	        if (x != null) {
+	        	txtAsignatura.setText(String.valueOf(x.getAsignatura())); 
+	            txtHora.setText(String.valueOf(x.getHora()));
+
+	            if (tipoRegresar == MODIFICAR) {
+	            	habilitarEntradas(true);
+	                txtCodigoCurso.setEditable(false);
+	                txtHora.setEditable(true);
+	                //txtAsignatura.setEditable(true);
+	                btnBuscar.setEnabled(false);
+					btnOK.setEnabled(true);
+					txtAsignatura.requestFocus();
+	            }
+	            if (tipoRegresar == ELIMINAR) {
+	                txtCodigoCurso.setEditable(false);
+	                btnBuscar.setEnabled(false);
+	                btnOK.setEnabled(true);
+	            }
+	        } else {
+	            error("El código del curso " + codigoCurso + " no existe", txtCodigoCurso);
+	        }
+	    } catch (Exception e) {
+	        error("Ingrese un CÓDIGO de curso correcto", txtCodigoCurso);
+	    }
+	}
+
+	void eliminarCurso() {
+		try {
+			int codigo = leerCodigoCurso();
+			Curso x = ac.buscar(codigo);
+			if (x != null) {
+				int ok = confirmar("¿Desea eliminar el registro?");
+				if (ok == 0) {
+					ac.eliminar(x);
+					listar();
+					btnOK.setEnabled(false);
+				}
+			}
+			else
+				error("El código" + codigo + "no existe", txtCodigoCurso);
+		}
+		catch (Exception e) {
+			error("Ingrese CÓDIGO correcto", txtCodigoCurso);
+		}
+	}
+
+	void limpiarCampos() {
+	    // Limpiar los campos que deseas al presionar el botón OK
+	    txtCodigoCurso.setText("");
+	    txtAsignatura.setText("");
+	    txtHora.setText("");
+	}
+	//  Métodos tipo void (con parámetros)
+	void habilitarEntradas(boolean sino) {
+		if (tipoRegresar == INGRESAR)
+			txtAsignatura.setEditable(sino);
+		txtHora.setEditable(sino);
+	}
+	void habilitarBotones(boolean sino) {
+		if (tipoRegresar == INGRESAR)
+			btnOK.setEnabled(!sino);
+		else {
+			btnBuscar.setEnabled(!sino);
+			btnOK.setEnabled(false);
+		}	
+		btnIngresar.setEnabled(sino);
+		btnModificar.setEnabled(sino);
+		btnConsultar.setEnabled(sino);
+		btnEliminar.setEnabled(sino);
+		btnRegresar.setEnabled(!sino);
+	}
+	void mensaje(String s) {
+		JOptionPane.showMessageDialog(this, s, "Información", 0);
+	}
+	void error(String s, JTextField txt) {
+		mensaje(s);
+		txt.setText("");
+		txt.requestFocus();
+	}
+	//  Métodos que retornan valor (sin parámetros)
+	int leerCodigoCurso() {
+		return Integer.parseInt(txtCodigoCurso.getText().trim());
+	}
+	String leerAsignatura() {
+		return txtAsignatura.getText().trim();
+	}
+	int leerHoras() {
+		return Integer.parseInt(txtHora.getText().trim());
+	}
+	//  Métodos que retornan valor (con parámetros)
+	int anchoColumna(int porcentaje) {
+		return porcentaje * scrollPane.getWidth() / 100;
+	}
+	double ajustar(double numero) {
+		return (int)(numero * 10) / 10.0;
+	}
+	int confirmar(String s) {
+		return JOptionPane.showConfirmDialog(this, s, "Alerta", 0, 1, null);
+	}
+}

@@ -1,0 +1,59 @@
+package arreglos;
+import java.util.ArrayList;
+
+
+import java.util.Calendar;
+import java.util.Date;
+
+import clases.AsignacionDocente;
+import clases.Curso;
+
+
+public class ArregloAsignacionDocente {
+
+//  Atributo privado
+	private ArrayList <AsignacionDocente> asi;
+	//  Constructor
+    public ArregloAsignacionDocente() {
+    	asi = new ArrayList <AsignacionDocente> ();
+		adicionar(new AsignacionDocente(5001,1001,3001,1,  asignarFecha(2023,10,18,17,16,30) ));
+		adicionar(new AsignacionDocente(5002, 1002,3002,1,  asignarFecha(2023,10,18,17,30,30)));
+		adicionar(new AsignacionDocente(5003, 1003,3003,1,  asignarFecha(2023,10,18,17,50,30) ));
+		adicionar(new AsignacionDocente(5004, 1004,3004,1,  asignarFecha(2023,10,18,17,40,30) ));
+		adicionar(new AsignacionDocente(5005, 1005,3005,1,  asignarFecha(2023,10,18,17,23,30)));
+    
+    }
+    
+    public void adicionar(AsignacionDocente x) {
+		asi.add(x);
+	}
+   
+    public Date asignarFecha(int year, int month, int date, int hour, int min, int sec) {
+    	Calendar calendar = Calendar.getInstance();
+    	calendar.set(year, month, date, hour, min, sec);
+    	return calendar.getTime();
+    }
+    public int tamanio() {
+		return asi.size();
+	}
+	public AsignacionDocente obtener(int i) {
+		return asi.get(i);
+	}
+	public AsignacionDocente buscar(int codigoAsignacion) {
+		for (int i=0; i<tamanio(); i++)
+			if (obtener(i).getCodigoAsignacion() == codigoAsignacion)
+				return obtener(i);
+		return null;
+	}
+	public void eliminar(AsignacionDocente x) {
+		asi.remove(x);
+	}
+	public int codigoCorrelativo() {
+		if (tamanio() == 0)
+			return 5001;
+		else
+			return obtener(tamanio()-1).getCodigoAsignacion() + 1;		
+	}
+	
+}
+

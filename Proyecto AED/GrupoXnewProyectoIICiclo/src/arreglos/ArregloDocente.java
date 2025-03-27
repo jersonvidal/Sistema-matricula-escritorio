@@ -1,0 +1,95 @@
+package arreglos;
+
+import java.io.*;
+
+
+
+import java.util.ArrayList;
+import clases.Docente;
+
+
+public class ArregloDocente {
+    private ArrayList<Docente> doc;
+
+    public ArregloDocente() {
+        doc = new ArrayList<>();
+        cargarDocentes();
+    }
+
+    public void adicionar(Docente x) {
+        doc.add(x);
+        grabarDocentes();
+    }
+
+    public void eliminar(Docente x) {
+        doc.remove(x);
+        grabarDocentes();
+    }
+
+    public int tamanio() {
+        return doc.size();
+    }
+
+    public Docente obtener(int i) {
+        return doc.get(i);
+    }
+
+    public Docente buscar(int codigo) {
+        for (int i = 0; i < doc.size(); i++) {
+            if (doc.get(i).getCodigoDocente() == codigo)
+                return doc.get(i);
+        }
+        return null;
+    }
+
+    public int codigoCorrelativo() {
+        if (doc.isEmpty()) return 1001;
+        return doc.get(doc.size() - 1).getCodigoDocente() + 1;
+    }
+
+    public void actualizarArchivo() {
+        grabarDocentes();
+    }
+
+    private void grabarDocentes() {
+        try (PrintWriter pw = new PrintWriter(new FileWriter("docentes.txt"))) {
+            for (Docente x : doc) {
+                String linea = x.getCodigoDocente() + ";" +
+                        x.getNombre() + ";" +
+                        x.getApellido() + ";" +
+                        x.getCategoria() + ";" +
+                        x.getTelefono() + ";" +
+                        x.getDni();
+                pw.println(linea);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void cargarDocentes() {
+        try (BufferedReader br = new BufferedReader(new FileReader("docentes.txt"))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] s = linea.split(";");
+                int codDocente = Integer.parseInt(s[0].trim());
+                String nombre = s[1].trim();
+                String apellido = s[2].trim();
+                String categoria = s[3].trim();
+                String telefono = s[4].trim();
+                String dni = s[5].trim();
+                Docente docente = new Docente(codDocente, nombre, apellido, categoria, telefono, dni);
+                if (docente != null) {
+                    adicionar(docente);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    
+  
+    
+    
+}

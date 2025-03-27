@@ -1,0 +1,138 @@
+package gui;
+
+import java.awt.EventQueue;
+import java.awt.Toolkit;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+
+import arreglos.ArregloAlumno;
+import arreglos.ArregloCurso;
+
+import javax.swing.JComboBox;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+public class Retiro extends JDialog implements ActionListener {
+
+	private static final long serialVersionUID = 1L;
+	private JLabel lblCodigo;
+	private JLabel lblCurso;
+	private JTextField txtCodigo;
+	private JComboBox<String> cboCurso;
+	private JButton btnRetiroTotal;
+	private JButton btnRetiroParcial;
+	private JButton btnBuscar;
+	private JScrollPane scrollPane;
+	private JTextArea textArea;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Retiro dialog = new Retiro();
+					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+					dialog.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the dialog.
+	 */
+	public Retiro() {
+		setIconImage(Toolkit.getDefaultToolkit().getImage("C:\\\\Users\\\\User\\\\Desktop\\\\AED_Proyecto_Grupo_1\\cibertec.png"));
+		
+		setTitle("Retiro");
+		setBounds(100, 100, 500, 350);
+		getContentPane().setLayout(null);
+		
+		lblCodigo = new JLabel("C\u00F3digo");
+		lblCodigo.setBounds(10, 11, 80, 23);
+		getContentPane().add(lblCodigo);
+		
+		txtCodigo = new JTextField();
+		txtCodigo.setColumns(10);
+		txtCodigo.setBounds(71, 11, 92, 23);
+		getContentPane().add(txtCodigo);
+		
+		btnBuscar = new JButton("Buscar");
+		btnBuscar.addActionListener(this);
+		btnBuscar.setEnabled(false);
+		btnBuscar.setBounds(166, 11, 101, 23);
+		getContentPane().add(btnBuscar);
+		
+		btnRetiroParcial = new JButton("Retiro Parcial");
+		btnRetiroParcial.addActionListener(this);
+		btnRetiroParcial.setBounds(354, 11, 120, 23);
+		getContentPane().add(btnRetiroParcial);
+		
+		lblCurso = new JLabel("Curso");
+		lblCurso.setBounds(10, 36, 80, 23);
+		getContentPane().add(lblCurso);
+		
+		cboCurso = new JComboBox<String>();
+		cboCurso.setBounds(71, 36, 92, 22);
+		getContentPane().add(cboCurso);
+	
+		btnRetiroTotal = new JButton("Retiro Total");
+		btnRetiroTotal.addActionListener(this);
+		btnRetiroTotal.setBounds(354, 36, 120, 23);
+		getContentPane().add(btnRetiroTotal);
+		
+		scrollPane = new JScrollPane();
+		scrollPane.setBounds(10, 70, 464, 230);
+		getContentPane().add(scrollPane);
+			
+		textArea = new JTextArea();
+		scrollPane.setViewportView(textArea);
+	}
+
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == btnBuscar) {
+			actionPerformedBtnBuscar(e);
+		}
+		if (e.getSource() == btnRetiroParcial) {
+			actionPerformedBtnRetiroParcial(e);
+		}
+		if (e.getSource() == btnRetiroTotal) {
+			actionPerformedBtnRetiroTotal(e);
+		}
+	}
+	
+	ArregloAlumno al = new ArregloAlumno();
+	ArregloCurso ac = new ArregloCurso();
+	
+	protected void actionPerformedBtnBuscar(ActionEvent e) {
+		String codigoAlumno = txtCodigo.getText();
+		if (codigoAlumno.equals("123")) { // Código de ejemplo, reemplazar con la lógica real
+            // Si se encuentra el alumno, se habilita el JComboBox con cursos de ejemplo
+            cboCurso.addItem("Curso A");
+            cboCurso.addItem("Curso B");
+            cboCurso.addItem("Curso C");
+            cboCurso.setEnabled(true);
+        } else {
+            // Si no se encuentra el alumno, se muestra un mensaje en el JTextArea
+            textArea.setText("Alumno no encontrado");
+            cboCurso.setEnabled(false);
+        }
+	}
+	protected void actionPerformedBtnRetiroParcial(ActionEvent e) {
+		String cursoSeleccionado = (String) cboCurso.getSelectedItem();
+        textArea.setText("Retiro parcial del curso: " + cursoSeleccionado);
+	}
+	protected void actionPerformedBtnRetiroTotal(ActionEvent e) {
+		String codigoAlumno = txtCodigo.getText();
+        textArea.setText("Retiro total de cursos para el alumno con código: " + codigoAlumno);
+	}
+}

@@ -1,0 +1,86 @@
+package arreglos;
+
+import java.io.*;
+import java.util.ArrayList;
+import clases.Alumno;
+
+
+
+public class ArregloAlumno {
+    private ArrayList<Alumno> alu;
+
+    public ArregloAlumno() {
+        alu = new ArrayList<>();
+        cargarAlumnos();
+    }
+
+    public void adicionar(Alumno x) {
+        alu.add(x);
+        grabarAlumnos();
+    }
+
+    public void eliminar(Alumno x) {
+        alu.remove(x);
+        grabarAlumnos();
+    }
+
+    public int tamanio() {
+        return alu.size();
+    }
+
+    public Alumno obtener(int i) {
+        return alu.get(i);
+    }
+
+    public Alumno buscar(int codigo) {
+        for (int i = 0; i < alu.size(); i++) {
+            if (alu.get(i).getCodigoAlumno() == codigo)
+                return alu.get(i);
+        }
+        return null;
+    }
+
+    public int codigoCorrelativo() {
+        if (alu.isEmpty()) return 2001;
+        return alu.get(alu.size() - 1).getCodigoAlumno() + 1;
+    }
+
+    public void actualizarArchivo() {
+        grabarAlumnos();
+    }
+
+    private void grabarAlumnos() {
+        try (PrintWriter pw = new PrintWriter(new FileWriter("alumnos.txt"))) {
+            for (Alumno x : alu) {
+                String linea = x.getCodigoAlumno() + ";" +
+                        x.getNombre() + ";" +
+                        x.getApellido() + ";" +
+                        x.getTelefono() + ";" +
+                        x.getDni();
+                pw.println(linea);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void cargarAlumnos() {
+        try (BufferedReader br = new BufferedReader(new FileReader("alumnos.txt"))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] s = linea.split(";");
+                int codAlumno = Integer.parseInt(s[0].trim());
+                String nombre = s[1].trim();
+                String apellido = s[2].trim();
+                String telefono = s[3].trim();
+                String dni = s[4].trim();
+                Alumno alumno = new Alumno(codAlumno, nombre, apellido, telefono, dni);
+                if (alumno != null) {
+                    adicionar(alumno);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

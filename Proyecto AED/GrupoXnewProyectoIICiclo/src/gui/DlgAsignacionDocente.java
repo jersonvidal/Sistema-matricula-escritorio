@@ -1,0 +1,445 @@
+package gui;
+
+import javax.swing.JButton;
+
+
+
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+
+import clases.Curso;
+import clases.Docente;
+
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.JTable;
+
+import arreglos.ArregloAsignacionDocente;
+import clases.AsignacionDocente;
+ 
+import arreglos.ArregloCurso;
+import arreglos.ArregloDocente;
+
+public class DlgAsignacionDocente extends JDialog implements ActionListener {
+
+	private static final long serialVersionUID = 1L;
+	private JLabel lblCodigoDocente;
+	private JLabel lblCodigoCurso;
+	private JLabel lblCodigoAsignacion;
+	private JTextField txtCodigoCurso;
+	private JTextField txtCodigoDocente;
+	private JTextField txtCodigoAsignacion;
+	private JButton btnBuscar;
+	private JButton btnAsignar;
+	private JButton btnConsultar;
+	private JButton btnEliminar;
+	private JButton btnRegresar;
+	private JScrollPane scrollPane;
+	private JTable table;
+	private DefaultTableModel modelo;
+	private JTable tblCurso;
+	
+	private int tipoRegresar;
+
+	//  Constantes para los tipos de operaciones
+	public final static int ASIGNAR  = 0;
+	public final static int CONSULTAR = 1;
+	public final static int ELIMINAR  = 2;
+	
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		try {
+			DlgAsignacionDocente dialog = new DlgAsignacionDocente();
+			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			dialog.setVisible(true);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Create the dialog.
+	 */
+	public DlgAsignacionDocente() {
+		setTitle("Asignacion de docente");
+		setBounds(100, 100, 650, 450);
+		getContentPane().setLayout(null);
+		
+		lblCodigoDocente = new JLabel("C\u00F3digo del docente");
+		lblCodigoDocente.setBounds(10, 36, 117, 23);
+		getContentPane().add(lblCodigoDocente);
+		
+		lblCodigoCurso = new JLabel("C\u00F3digo del curso");
+		lblCodigoCurso.setBounds(10, 61, 101, 23);
+		getContentPane().add(lblCodigoCurso);
+		
+		lblCodigoAsignacion = new JLabel("Codigo de Asignacion");
+		lblCodigoAsignacion.setBounds(10, 11, 125, 23);
+		getContentPane().add(lblCodigoAsignacion);
+		
+		txtCodigoDocente = new JTextField();
+		txtCodigoDocente.setEditable(false);
+		txtCodigoDocente.setColumns(10);
+		txtCodigoDocente.setBounds(147, 36, 92, 23);
+		getContentPane().add(txtCodigoDocente);
+		
+		txtCodigoAsignacion = new JTextField();
+		txtCodigoAsignacion.setEditable(false);
+		txtCodigoAsignacion.setColumns(10);
+		txtCodigoAsignacion.setBounds(147, 11, 92, 23);
+		getContentPane().add(txtCodigoAsignacion);
+		
+		txtCodigoCurso = new JTextField();
+		txtCodigoCurso.setEditable(false);
+		txtCodigoCurso.setColumns(10);
+		txtCodigoCurso.setBounds(147, 61, 92, 23);
+		getContentPane().add(txtCodigoCurso);
+		
+		btnBuscar = new JButton("Buscar");
+		btnBuscar.addActionListener(this);
+		btnBuscar.setEnabled(false);
+		btnBuscar.setBounds(241, 11, 101, 23);
+		getContentPane().add(btnBuscar);
+		
+		btnAsignar = new JButton("Asignar");
+		btnAsignar.addActionListener(this);
+		btnAsignar.setBounds(504, 11, 120, 23);
+		getContentPane().add(btnAsignar);
+		
+		btnConsultar = new JButton("Consultar");
+		btnConsultar.addActionListener(this);
+		btnConsultar.setBounds(504, 36, 120, 23);
+		getContentPane().add(btnConsultar);
+		
+		btnEliminar = new JButton("Eliminar");
+		btnEliminar.addActionListener(this);
+		btnEliminar.setBounds(504, 61, 120, 23);
+		getContentPane().add(btnEliminar);
+		
+		btnRegresar = new JButton("Regresar");
+		btnRegresar.addActionListener(this);
+		btnRegresar.setEnabled(false);
+		btnRegresar.setBounds(504, 86, 120, 23);
+		getContentPane().add(btnRegresar);
+		
+		scrollPane = new JScrollPane();
+		scrollPane.setBounds(10, 120, 614, 280);
+		getContentPane().add(scrollPane);
+		
+		table = new JTable();
+		table.setFillsViewportHeight(true);
+		scrollPane.setViewportView(table);
+		
+		tblCurso = new JTable();
+		tblCurso.setFillsViewportHeight(true);
+		scrollPane.setViewportView(tblCurso);
+		
+		modelo = new DefaultTableModel();
+		modelo.addColumn("CODIGO DE ASIGNACION");
+		modelo.addColumn("CODIGO DE DOCENTE");
+		modelo.addColumn("CODIGO CURSO");
+		modelo.addColumn("ESTADO");
+	
+		
+		tblCurso.setModel(modelo);
+		
+		listar();
+	}
+
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == btnBuscar) {
+			actionPerformedBtnBuscar(e);
+		}
+		if (e.getSource() == btnAsignar) {
+			actionPerformedBtnAsignar(e);
+		}
+		if (e.getSource() == btnConsultar) {
+			actionPerformedBtnConsultar(e);
+		}
+		if (e.getSource() == btnEliminar) {
+			actionPerformedBtnEliminar(e);
+		}
+		if (e.getSource() == btnRegresar) {
+			actionPerformedBtnRegresar(e);
+		}
+	}
+	
+	
+	ArregloAsignacionDocente as = new ArregloAsignacionDocente();
+	ArregloCurso ac = new ArregloCurso();
+	ArregloDocente ad = new ArregloDocente();
+	
+	
+	protected void actionPerformedBtnBuscar(ActionEvent e) {    
+	    btnBuscar.setText("Buscar");
+	    switch(tipoRegresar) {
+	        case CONSULTAR:
+	            consultarAsignacion();
+	            break;
+	        case ASIGNAR:
+	            asignarDocente();
+	            ac.actualizarArchivo();
+	            break;
+	        default:
+	            eliminarAsignacionDocente();
+	            ac.actualizarArchivo();
+	    }
+	}    
+
+	protected void actionPerformedBtnAsignar(ActionEvent e) {    
+	    tipoRegresar=ASIGNAR;
+	    habilitarEntradas();
+	    habilitarBotones(false);
+	    txtCodigoAsignacion.setText("" + as.codigoCorrelativo());
+	}
+
+	protected void actionPerformedBtnConsultar(ActionEvent e) {       
+	    tipoRegresar = CONSULTAR;
+	    habilitarEntradas();
+	    txtCodigoAsignacion.setEditable(true);
+	    habilitarBotones(false);
+	    txtCodigoAsignacion.requestFocus();
+	    btnBuscar.setEnabled(true);
+	}
+
+	protected void actionPerformedBtnEliminar(ActionEvent e) {    
+	    tipoRegresar=ELIMINAR;
+	    habilitarEntradas();
+	    habilitarBotones(false);
+	    btnBuscar.setText("Eliminar");
+	}
+
+	protected void actionPerformedBtnRegresar(ActionEvent e) {    
+	    txtCodigoCurso.setText("");
+	    txtCodigoDocente.setText("");
+	    txtCodigoAsignacion.setText("");
+	    btnBuscar.setEnabled(false);
+	    txtCodigoAsignacion.setEditable(false);
+	    txtCodigoDocente.setEditable(false);
+	    txtCodigoCurso.setEditable(false);
+	    btnBuscar.setText("Buscar");
+	    habilitarBotones(true);
+	    listar();
+	}
+
+	
+
+	void listar() {
+	    AsignacionDocente x;
+	    modelo.setRowCount(0);
+	    for (int i = 0; i < as.tamanio(); i++) {
+	        x = as.obtener(i);
+	        Object[] fila = { x.getCodigoAsignacion(),
+	                          x.getCodigoDocente(),
+	                          x.getCodigoCurso(),
+	                          x.getDescripcionEstado()};
+	        modelo.addRow(fila);
+	    }
+	}
+
+	
+	
+	void asignarDocente() {
+	    try {
+	        btnBuscar.setText("Asignar");
+	        int codigoAsignacion = leerCodigoAsignacion();
+	        if (codigoAsignacion > 0) {
+	            int codigoDocente = leerCodigoDocente();
+	            if (codigoDocente > 0) {
+	                int codigoCurso = leerCodigoCurso();
+	                if (codigoCurso > 0) {
+	                    // Verificar si el código de asignación ya existe
+	                    if (as.buscar(codigoAsignacion) != null) {
+	                        error("El código de asignación " + codigoAsignacion + " ya existe", txtCodigoAsignacion);
+	                        return;
+	                    }
+
+	                    // Verificar si el código de docente existe
+	                    Docente docente = ad.buscar(codigoDocente);
+	                    if (docente == null) {
+	                        error("El código de docente " + codigoDocente + " no existe", txtCodigoDocente);
+	                        return;
+	                    }
+
+	                    // Verificar si el código de curso existe
+	                    Curso curso = ac.buscar(codigoCurso);
+	                    if (curso == null) {
+	                        error("El código de curso " + codigoCurso + " no existe", txtCodigoCurso);
+	                        return;
+	                    }
+
+	                    // Crear una nueva instancia de AsignacionDocente
+	                    AsignacionDocente nuevaAsignacion = new AsignacionDocente(codigoAsignacion, codigoDocente, codigoCurso, 1);
+	                    as.adicionar(nuevaAsignacion);
+
+	                    // Resto del código para listar y limpiar campos...
+	                    listar();
+	                    txtCodigoAsignacion.setText("" + as.codigoCorrelativo());
+	                    txtCodigoDocente.setText("");
+	                    txtCodigoDocente.requestFocus();
+	                    txtCodigoCurso.setText("");
+	                } else {
+	                    error("Ingrese un código de curso válido", txtCodigoCurso);
+	                }
+	            } else {
+	                error("Ingrese un código de docente válido", txtCodigoDocente);
+	            }
+	        } else {
+	            error("Ingrese un código de asignación válido", txtCodigoAsignacion);
+	        }
+	    } catch (Exception e) {
+	        mensaje("El código ingresado debe ser un número");
+	    }
+	}
+	
+	
+	
+	
+	void consultarAsignacion() {
+	    try {
+	        int codigoAsignacion = leerCodigoAsignacion();
+	        AsignacionDocente asignacion = as.buscar(codigoAsignacion);
+
+	        if (asignacion != null) {
+	            // Verificar si el código de docente existe
+	            Docente docente = ad.buscar(asignacion.getCodigoDocente());
+	            if (docente == null) {
+	                error("El código de docente " + asignacion.getCodigoDocente() + " no existe", txtCodigoDocente);
+	                return;
+	            }
+
+	            // Verificar si el código de curso existe
+	            Curso curso = ac.buscar(asignacion.getCodigoCurso());
+	            if (curso == null) {
+	                error("El código de curso " + asignacion.getCodigoCurso() + " no existe", txtCodigoCurso);
+	                return;
+	            }
+
+	            // Mostrar la información en la tabla
+	            txtCodigoCurso.setText(String.valueOf(asignacion.getCodigoCurso()));
+	            txtCodigoDocente.setText(String.valueOf(asignacion.getCodigoDocente()));
+
+	            modelo.setRowCount(0);
+
+	            Object[] fila = {
+	                    asignacion.getCodigoAsignacion(),
+	                    asignacion.getCodigoDocente(),
+	                    asignacion.getCodigoCurso(),
+	                    asignacion.getDescripcionEstado(),
+	            };
+	            modelo.addRow(fila);
+	        } else {
+	            error("El código de asignación " + codigoAsignacion + " no existe", txtCodigoAsignacion);
+	        }
+	    } catch (NumberFormatException e) {
+	        error("Ingrese un CÓDIGO de asignación correcto", txtCodigoAsignacion);
+	    }
+	}
+	
+	
+	void eliminarAsignacionDocente() {
+	    try {
+	        btnBuscar.setText("Eliminar");
+	        int codigoAsignacion = leerCodigoAsignacion();
+	        AsignacionDocente asignacion = as.buscar(codigoAsignacion);
+
+	        if (asignacion != null) {
+	            // Mostrar detalles de la asignación a eliminar
+	            String mensajeConfirmacion = "¿Desea eliminar la asignación con los siguientes detalles?\n\n" +
+	                    "Código de asignación: " + asignacion.getCodigoAsignacion() + "\n" +
+	                    "Código de docente: " + asignacion.getCodigoDocente() + "\n" +
+	                    "Código de curso: " + asignacion.getCodigoCurso() + "\n" +
+	                    "Estado: " + asignacion.getDescripcionEstado();
+
+	            int confirmacion = confirmar(mensajeConfirmacion);
+
+	            if (confirmacion == 0) {
+	                txtCodigoAsignacion.setText("");
+	                txtCodigoAsignacion.requestFocus();
+	                as.eliminar(asignacion);
+	                ac.eliminarAsignacionDocente(asignacion.getCodigoCurso());
+	                listar();
+	            }
+	        } else {
+	            error("El código " + codigoAsignacion + " no existe", txtCodigoAsignacion);
+	        }
+	    } catch (NumberFormatException e) {
+	        error("Ingrese un CÓDIGO correcto", txtCodigoAsignacion);
+	    }
+	}
+	
+	
+	
+
+	void habilitarEntradas() {
+		switch(tipoRegresar) {
+		case ASIGNAR: 
+			btnBuscar.setText("Asignar");
+			btnBuscar.setEnabled(true);
+			txtCodigoAsignacion.setEditable(false);
+			txtCodigoDocente.setEditable(true);
+			txtCodigoCurso.setEditable(true);
+
+			break;
+		case CONSULTAR:
+			btnBuscar.setText("Buscar");
+			btnBuscar.setEnabled(true);
+			txtCodigoAsignacion.setEditable(true);
+			txtCodigoDocente.setEditable(false);
+			txtCodigoCurso.setEditable(false);
+			break;
+		default:
+			btnBuscar.setText("Eliminar");
+			btnBuscar.setEnabled(true);
+			txtCodigoAsignacion.setEditable(true);
+			txtCodigoDocente.setEditable(false);
+			txtCodigoCurso.setEditable(false);
+			
+		
+		}
+	}
+	void habilitarBotones(boolean sino) {
+		btnAsignar.setEnabled(sino);
+		btnConsultar.setEnabled(sino);
+		btnEliminar.setEnabled(sino);
+		btnRegresar.setEnabled(!sino);		
+	}
+	
+	
+
+	
+	void mensaje(String s) {
+		JOptionPane.showMessageDialog(this, s, "Información", 0);
+	}
+	void error(String s, JTextField txt) {
+		mensaje(s);
+		txt.setText("");
+		txt.requestFocus();
+	}
+	//  Métodos que retornan valor (sin parámetros)
+	int leerCodigoCurso() {
+		return Integer.parseInt(txtCodigoCurso.getText().trim());
+	}
+	int leerCodigoDocente() {
+		return Integer.parseInt(txtCodigoDocente.getText().trim());
+	}
+
+	int leerCodigoAsignacion() {
+		return Integer.parseInt(txtCodigoAsignacion.getText().trim());
+	}
+	
+	int confirmar(String s) {
+		return JOptionPane.showConfirmDialog(this, s, "Alerta", 0, 1, null);
+	}
+	
+}

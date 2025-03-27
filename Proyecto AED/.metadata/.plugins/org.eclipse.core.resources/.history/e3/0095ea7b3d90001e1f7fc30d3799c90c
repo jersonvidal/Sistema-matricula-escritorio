@@ -1,0 +1,109 @@
+package gui;
+
+import java.awt.EventQueue;
+
+
+import java.awt.Toolkit;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
+import arreglos.ArregloAsignacionDocente;
+import arreglos.ArregloDocente;
+import clases.AsignacionDocente;
+import clases.Docente;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+public class ReporteDocenteSinAsignacionCurso extends JDialog implements ActionListener {
+
+	private static final long serialVersionUID = 1L;
+	private JButton btnReportar;
+	private JScrollPane scrollPane;
+	private JTextArea textArea;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					ReporteDocenteSinAsignacionCurso dialog = new ReporteDocenteSinAsignacionCurso();
+					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+					dialog.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the dialog.
+	 */
+	public ReporteDocenteSinAsignacionCurso() {
+		setIconImage(Toolkit.getDefaultToolkit().getImage("C:\\\\Users\\\\User\\\\Desktop\\\\AED_Proyecto_Grupo_1\\cibertec.png"));
+		
+		setTitle("Reporte | Docentes sin asignación de curso");
+		setBounds(100, 100, 450, 350);
+		getContentPane().setLayout(null);
+		
+		btnReportar = new JButton("Reportar");
+		btnReportar.addActionListener(this);
+		btnReportar.setBounds(161, 11, 120, 23);
+		getContentPane().add(btnReportar);
+		
+		scrollPane = new JScrollPane();
+		scrollPane.setBounds(10, 45, 414, 255);
+		getContentPane().add(scrollPane);
+		
+		textArea = new JTextArea();
+		scrollPane.setViewportView(textArea);
+	}
+	 ArregloDocente ad = new ArregloDocente();
+	  ArregloAsignacionDocente aa = new ArregloAsignacionDocente();
+	
+
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == btnReportar) {
+			actionPerformedBtnReportar(e);
+		}
+	}
+	
+	protected void actionPerformedBtnReportar(ActionEvent e) {
+	    // Limpiar el área de texto antes de cada reporte
+	    textArea.setText("");
+
+	    // Recorrer el arreglo de docentes
+	    for (int i = 0; i < ad.tamanio(); i++) {
+	        Docente docente = ad.obtener(i);
+
+	        // Verificar si el docente no tiene asignaciones
+	        if (!tieneAsignaciones(docente.getCodigoDocente())) {
+	            // Mostrar datos del docente sin asignación
+	            textArea.append("Código: " + docente.getCodigoDocente() + "\n");
+	            textArea.append("Nombre: " + docente.getNombre() + "\n");
+	            textArea.append("Apellido: " + docente.getApellido() + "\n");
+	            textArea.append("-----\n");
+	        }
+	    }
+	}
+
+	// Método para verificar si un docente tiene asignaciones
+	private boolean tieneAsignaciones(int codigoDocente) {
+	    for (int i = 0; i < aa.tamanio(); i++) {
+	        AsignacionDocente asignacion = aa.obtener(i);
+	        if (asignacion.getCodigoDocente() == codigoDocente) {
+	            return true; // El docente tiene al menos una asignación
+	        }
+	    }
+	    return false; // El docente no tiene asignaciones
+	}
+	
+	
+	
+}

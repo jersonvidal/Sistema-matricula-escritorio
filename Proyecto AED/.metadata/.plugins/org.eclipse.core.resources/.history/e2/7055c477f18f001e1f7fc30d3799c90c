@@ -1,0 +1,83 @@
+package arreglos;
+
+import java.io.*;
+
+import java.util.ArrayList;
+import clases.Matricula;
+
+
+
+public class ArregloMatricula {
+    private ArrayList<Matricula> matriculas;
+
+    public ArregloMatricula() {
+        matriculas = new ArrayList<>();
+        cargarMatriculas();
+    }
+
+    public void adicionar(Matricula x) {
+        matriculas.add(x);
+        grabarMatriculas();
+    }
+
+    public void eliminar(Matricula x) {
+        matriculas.remove(x);
+        grabarMatriculas();
+    }
+
+    public int tamanio() {
+        return matriculas.size();
+    }
+
+    public Matricula obtener(int i) {
+        return matriculas.get(i);
+    }
+
+    public Matricula buscar(int codigo) {
+        for (int i = 0; i < matriculas.size(); i++) {
+            if (matriculas.get(i).getCodigoMatricula() == codigo)
+                return matriculas.get(i);
+        }
+        return null;
+    }
+
+    public int codigoCorrelativo() {
+        if (matriculas.isEmpty()) return 4001;
+        return matriculas.get(matriculas.size() - 1).getCodigoMatricula() + 1;
+    }
+
+    public void actualizarArchivo() {
+        grabarMatriculas();
+    }
+
+    private void grabarMatriculas() {
+        try (PrintWriter pw = new PrintWriter(new FileWriter("matriculas.txt"))) {
+            for (Matricula x : matriculas) {
+                String linea = x.getCodigoMatricula() + ";" +
+                        x.getCodigoAlumno() + ";" +
+                        x.getCodigoCurso();
+                pw.println(linea);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void cargarMatriculas() {
+        try (BufferedReader br = new BufferedReader(new FileReader("matriculas.txt"))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] s = linea.split(";");
+                int codMatricula = Integer.parseInt(s[0].trim());
+                int codAlumno = Integer.parseInt(s[1].trim());
+                int codCurso = Integer.parseInt(s[2].trim());
+                Matricula matricula = new Matricula(codMatricula, codAlumno, codCurso);
+                if (matricula != null) {
+                    adicionar(matricula);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

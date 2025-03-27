@@ -1,0 +1,97 @@
+package arreglos;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+
+import clases.AsignacionDocente;
+
+public class ArregloAsignacionDocente {
+
+    // Atributo privado
+    private ArrayList<AsignacionDocente> asi;
+
+    // Constructor
+    public ArregloAsignacionDocente() {
+        asi = new ArrayList<>();
+        cargarAsignaciones();
+    }
+
+    public void adicionar(AsignacionDocente x) {
+        asi.add(x);
+        grabarAsignaciones();
+    }
+
+    public Date asignarFecha(int year, int month, int date, int hour, int min, int sec) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month - 1, date, hour, min, sec); // Se resta 1 al mes porque Calendar representa en base 0
+        return calendar.getTime();
+    }
+
+    public int tamanio() {
+        return asi.size();
+    }
+
+    public AsignacionDocente obtener(int i) {
+        return asi.get(i);
+    }
+
+    public AsignacionDocente buscar(int codigoAsignacion) {
+        for (int i = 0; i < tamanio(); i++)
+            if (obtener(i).getCodigoAsignacion() == codigoAsignacion)
+                return obtener(i);
+        return null;
+    }
+
+    public void eliminar(AsignacionDocente x) {
+        asi.remove(x);
+        grabarAsignaciones();
+    }
+
+    public int codigoCorrelativo() {
+        if (tamanio() == 0)
+            return 5001;
+        else
+            return obtener(tamanio() - 1).getCodigoAsignacion() + 1;
+    }
+
+    public void actualizarArchivo() {
+        grabarAsignaciones();
+    }
+
+    private void grabarAsignaciones() {
+        try (PrintWriter pw = new PrintWriter(new FileWriter("asignacionDocentes.txt"))) {
+            for (AsignacionDocente x : asi) {
+                String linea = x.getCodigoAsignacion() + ";" +
+                        x.getCodigoDocente() + ";" +
+                        x.getCodigoCurso() + ";" +
+                        x.getEstadoAsignacion() + ";" +
+                        x.getFechaAsignacion().getTime();
+                pw.println(linea);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void cargarAsignaciones() {
+        try (BufferedReader br = new BufferedReader(new FileReader("asignacionDocentes.txt"))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] s = linea.split(";");
+                int codAsignacion = Integer.parseInt(s[0].trim());
+                int codDocente = Integer.parseInt(s[1].trim());
+                int codCurso = Integer.parseInt(s[2].trim());
+                int estadoAsignacion = Integer.parseInt(s[3].trim());
+                long fechaMillis = Long.parseLong(s[4].trim());
+                AsignacionDocente asignacion = new AsignacionDocente(codAsignacion, codDocente, codCurso, estadoAsignacion, new java.util.Date(fechaMillis));
+                if (asignacion != null) {
+                    adicionar(asignacion);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

@@ -1,0 +1,96 @@
+package gui;
+
+import java.awt.EventQueue;
+
+
+import java.awt.Toolkit;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+
+import arreglos.ArregloCurso;
+import clases.Curso;
+
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+public class ReporteCurso extends JDialog implements ActionListener {
+
+	private static final long serialVersionUID = 1L;
+	private JTextField txtCodigoCurso;
+	private JLabel lblCodigoCurso;
+	private JButton btnBorrar;
+	private JButton btnBuscar;
+	private JScrollPane scrollPane;
+	private JTextArea txtResultado;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					ReporteCurso dialog = new ReporteCurso();
+					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+					dialog.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the dialog.
+	 */
+	public ReporteCurso() {
+		setIconImage(Toolkit.getDefaultToolkit().getImage("C:\\\\Users\\\\User\\\\Desktop\\\\AED_Proyecto_Grupo_1\\cibertec.png"));
+		
+		setTitle("Reporte | Curso");
+		setBounds(100, 100, 500, 350);
+		getContentPane().setLayout(null);
+		
+		lblCodigoCurso = new JLabel("C\u00F3digo");
+		lblCodigoCurso.setBounds(10, 11, 80, 23);
+		getContentPane().add(lblCodigoCurso);
+		
+		txtCodigoCurso = new JTextField();
+		txtCodigoCurso.setColumns(10);
+		txtCodigoCurso.setBounds(71, 11, 92, 23);
+		getContentPane().add(txtCodigoCurso);
+		
+		btnBuscar = new JButton("Buscar");
+		btnBuscar.addActionListener(this);
+		btnBuscar.setBounds(166, 11, 101, 23);
+		getContentPane().add(btnBuscar);
+		
+		btnBorrar = new JButton("Borrar");
+		btnBorrar.addActionListener(this);
+		btnBorrar.setBounds(354, 11, 120, 23);
+		getContentPane().add(btnBorrar);
+		
+		scrollPane = new JScrollPane();
+		scrollPane.setBounds(10, 45, 464, 255);
+		getContentPane().add(scrollPane);
+		
+		txtResultado = new JTextArea();
+		scrollPane.setViewportView(txtResultado);
+	}
+
+	//Declaración global
+	ArregloCurso ac = new ArregloCurso();
+	
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == btnBuscar) {
+			actionPerformedBtnBuscar(e);
+		}
+		if (e.getSource() == btnBorrar) {
+			actionPerformedBtnBorrar(e);
+		}
+	}
